@@ -53,6 +53,13 @@ func WithSubjectPattern(pattern string) PoolOption {
 	}
 }
 
+func WithFilterExpression(expr string) PoolOption {
+	return func(req *portalapi.SavePoolRequest) error {
+		req.FilterExpression = expr
+		return nil
+	}
+}
+
 func WithEventTypes(eventTypes []string) PoolOption {
 	return func(req *portalapi.SavePoolRequest) error {
 		req.EventTypes = eventTypes
