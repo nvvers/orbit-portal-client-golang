@@ -27,7 +27,7 @@ func (c *Client) SavePool(poolName string, opts ...PoolOption) error {
 		}
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/save-pool", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/save-pool", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to save pool: %w", err)
 	}

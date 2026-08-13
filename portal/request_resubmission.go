@@ -17,7 +17,7 @@ func (c *Client) RequestResubmission(poolName string, eventID uuid.UUID, resubmi
 		ResubmissionTime: resubmissionTime,
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/request-resubmission", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/request-resubmission", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to request resubmission: %w", err)
 	}

@@ -7,13 +7,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 )
 
 type Client struct {
 	httpClient    *http.Client
-	portalBaseUrl string
+	portalBaseUrl *url.URL
 	portalToken   string
 }
 
@@ -23,9 +24,14 @@ type Option func(c *Client) error
 // NewClient creates a new Client with the given portalBaseUrl and applies any provided options.
 // It returns an error if any of the options fail to apply.
 func NewClient(portalBaseUrl string, opts ...Option) (*Client, error) {
+	baseUrl, err := url.Parse(portalBaseUrl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse portal base URL: %w", err)
+	}
+
 	c := &Client{
 		httpClient:    &http.Client{},
-		portalBaseUrl: portalBaseUrl,
+		portalBaseUrl: baseUrl,
 	}
 
 	for _, opt := range opts {
@@ -39,6 +45,10 @@ func NewClient(portalBaseUrl string, opts ...Option) (*Client, error) {
 
 func WithToken(token string) Option {
 	return func(c *Client) error {
+		if c.portalBaseUrl.Scheme != "https" {
+			slog.Warn("Using a token with a non-HTTPS URL is not secure. Consider using HTTPS for secure communication.")
+		}
+
 		c.portalToken = token
 		return nil
 	}
@@ -55,17 +65,11 @@ func WithHttpClient(hClient *http.Client) Option {
 	}
 }
 
-func (c *Client) createGetRequest(ctx context.Context, portalApiEndpoint, query string) (*http.Request, error) {
-	apiEndpoint, err := url.JoinPath(c.portalBaseUrl, portalApiEndpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to construct API endpoint: %w", err)
-	}
+func (c *Client) createGetRequest(ctx context.Context, portalApiEndpoint string, query url.Values) (*http.Request, error) {
+	apiEndpoint := c.portalBaseUrl.JoinPath(portalApiEndpoint)
+	apiEndpoint.RawQuery = query.Encode()
 
-	if query != "" {
-		apiEndpoint = apiEndpoint + "?" + query
-	}
-
-	httpReq, err := http.NewRequestWithContext(ctx, "GET", apiEndpoint, nil)
+	httpReq, err := http.NewRequestWithContext(ctx, "GET", apiEndpoint.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -77,22 +81,33 @@ func (c *Client) createGetRequest(ctx context.Context, portalApiEndpoint, query 
 	return httpReq, nil
 }
 
-func (c *Client) createPostRequest(ctx context.Context, portalApiEndpoint, query string, payload any) (*http.Request, error) {
-	apiEndpoint, err := url.JoinPath(c.portalBaseUrl, portalApiEndpoint)
+func (c *Client) createPostRequest(ctx context.Context, portalApiEndpoint string, query url.Values, payload io.Reader) (*http.Request, error) {
+	apiEndpoint := c.portalBaseUrl.JoinPath(portalApiEndpoint)
+	apiEndpoint.RawQuery = query.Encode()
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", apiEndpoint.String(), payload)
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct API endpoint: %w", err)
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/octet-stream")
+
+	if c.portalToken != "" {
+		httpReq.Header.Set("Authorization", "Bearer "+c.portalToken)
 	}
 
-	if query != "" {
-		apiEndpoint = apiEndpoint + "?" + query
-	}
+	return httpReq, nil
+}
+
+func (c *Client) createPostRequestWithJsonBody(ctx context.Context, portalApiEndpoint string, query url.Values, payload any) (*http.Request, error) {
+	apiEndpoint := c.portalBaseUrl.JoinPath(portalApiEndpoint)
+	apiEndpoint.RawQuery = query.Encode()
 
 	reqData, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request data: %w", err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", apiEndpoint, bytes.NewBuffer(reqData))
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", apiEndpoint.String(), bytes.NewBuffer(reqData))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -107,7 +122,7 @@ func (c *Client) createPostRequest(ctx context.Context, portalApiEndpoint, query
 
 func expect(resp *http.Response, expectedStatusCode int) error {
 	if resp.StatusCode != expectedStatusCode {
-		errText, _ := io.ReadAll(resp.Body)
+		errText, _ := io.ReadAll(io.LimitReader(resp.Body, 1*1024*1024)) // limit to 1MB
 		return fmt.Errorf("failed to call API, code: %d expected: %d, response: %s", resp.StatusCode, expectedStatusCode, errText)
 	}
 

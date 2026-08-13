@@ -292,7 +292,7 @@ configuration and hands you a preconfigured client.
 
 ```go
 func TestOrders(t *testing.T) {
-	pc, err := portaltestcontainer.New(portaltestcontainer.WithToken("secret"))
+	pc, err := portaltestcontainer.New()
 	if err != nil {
 		t.Fatal(err)
 	}

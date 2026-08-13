@@ -13,7 +13,7 @@ func (c *Client) DeleteSchema(eventType string) error {
 		EventType: eventType,
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/delete-schema", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/delete-schema", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to delete schema: %w", err)
 	}

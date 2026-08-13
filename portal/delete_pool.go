@@ -13,7 +13,7 @@ func (c *Client) DeletePool(poolName string) error {
 		PoolName: poolName,
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/delete-pool", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/delete-pool", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to delete pool: %w", err)
 	}

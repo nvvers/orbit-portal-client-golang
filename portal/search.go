@@ -45,7 +45,7 @@ func (c *Client) Search(folder string, pattern string) error {
 					return fmt.Errorf("failed to open event file in dump: %w", err)
 				}
 
-				data, err := io.ReadAll(f)
+				data, err := io.ReadAll(io.LimitReader(f, 1*1024*1024)) // limit to 1MB
 				if err != nil {
 					return fmt.Errorf("failed to read event file in dump: %w", err)
 				}

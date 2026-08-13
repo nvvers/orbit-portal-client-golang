@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Client) VerifyToken() error {
-	hReq, err := c.createGetRequest(context.Background(), "/api/v1/verify-token", "")
+	hReq, err := c.createGetRequest(context.Background(), "/api/v1/verify-token", nil)
 	if err != nil {
 		return fmt.Errorf("failed to create verify-token request: %w", err)
 	}

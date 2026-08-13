@@ -13,7 +13,7 @@ import (
 func (c *Client) GetAttachment(attachmentID uuid.UUID, w io.Writer) error {
 	req := portalapi.GetAttachmentRequest{AttachmentID: attachmentID}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/get-attachment", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/get-attachment", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}

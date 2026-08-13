@@ -13,7 +13,7 @@ import (
 
 func (c *Client) PullNotification(poolName string) (*orbit.Notification, error) {
 	req := portalapi.PullNotificationRequest{PoolName: poolName}
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/pull-notification", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/pull-notification", nil, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request for pulling notification: %w", err)
 	}
@@ -36,6 +36,6 @@ func (c *Client) PullNotification(poolName string) (*orbit.Notification, error) 
 		return nil, nil
 	}
 
-	resData, _ := io.ReadAll(hRes.Body)
+	resData, _ := io.ReadAll(io.LimitReader(hRes.Body, 1*1024*1024)) // limit to 1MB
 	return nil, fmt.Errorf("failed to pull notification, code: %d: %s", hRes.StatusCode, string(resData))
 }

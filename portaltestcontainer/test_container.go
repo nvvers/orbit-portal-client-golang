@@ -2,6 +2,8 @@ package portaltestcontainer
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/url"
@@ -29,7 +31,7 @@ func New(opts ...ContainerOption) (*TestContainer, error) {
 	c := &TestContainer{
 		imageTag:     "latest",
 		internalPort: 8080,
-		token:        "secret",
+		token:        randomToken(),
 	}
 
 	for _, opt := range opts {
@@ -208,4 +210,13 @@ func (p *TestContainer) GetClient(ctx context.Context) (*portal.Client, error) {
 	}
 
 	return client, nil
+}
+
+func randomToken() string {
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return "secret-token"
+	}
+
+	return hex.EncodeToString(b)
 }

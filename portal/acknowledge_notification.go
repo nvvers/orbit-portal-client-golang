@@ -17,7 +17,7 @@ func (c *Client) AcknowledgeNotification(poolName string, eventID uuid.UUID, sub
 		SubsequentEvents: subsequentEvents,
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/acknowledge-notification", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/acknowledge-notification", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to acknowledge notification: %w", err)
 	}

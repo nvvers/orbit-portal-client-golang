@@ -18,7 +18,7 @@ func (c *Client) SaveSchema(eventType string, schema map[string]any) error {
 		Schema:    schema,
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/save-schema", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/save-schema", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to save schema: %w", err)
 	}

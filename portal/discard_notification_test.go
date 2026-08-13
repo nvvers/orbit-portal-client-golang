@@ -8,7 +8,7 @@ import (
 )
 
 func TestClient_DiscardNotification(t *testing.T) {
-	pc, err := portaltestcontainer.New(portaltestcontainer.WithToken("secret"))
+	pc, err := portaltestcontainer.New()
 	if err != nil {
 		t.Fatalf("Failed to create test container: %v", err)
 	}

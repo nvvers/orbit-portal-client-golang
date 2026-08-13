@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/internal/portalapi"
@@ -15,7 +16,7 @@ import (
 func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yield func(orbit.Notification)) error {
 	req := portalapi.ObserveNotificationsRequest{PoolName: poolName}
 
-	hReq, err := c.createPostRequest(ctx, "/api/v1/observe-notifications", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(ctx, "/api/v1/observe-notifications", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to create request for observing notifications: %w", err)
 	}
@@ -63,7 +64,9 @@ func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yiel
 
 				yield(notification)
 
-				hReq, err := c.createPostRequest(ctx, "/api/v1/observe-notifications", "release="+connId, req)
+				// Release connection, to allow the portal to send more notifications to this client.
+
+				hReq, err := c.createPostRequestWithJsonBody(ctx, "/api/v1/observe-notifications", url.Values{"release": {connId}}, req)
 				if err != nil {
 					return fmt.Errorf("failed to release connection: %w", err)
 				}
@@ -75,10 +78,11 @@ func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yiel
 
 				err = expect(hRes, http.StatusOK)
 				if err != nil {
+					hRes.Body.Close()
 					return fmt.Errorf("failed to release connection: %w", err)
 				}
 
-				_ = hRes.Body.Close()
+				hRes.Body.Close()
 
 			case orbit.MessageTypeClose:
 				return nil

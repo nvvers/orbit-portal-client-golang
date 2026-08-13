@@ -27,12 +27,10 @@ func (c *Client) SaveAttachmentFromFile(filepath string) (orbit.Attachment, erro
 func (c *Client) SaveAttachment(reader io.Reader) (orbit.Attachment, error) {
 	nilAttachment := orbit.Attachment{}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/save-attachment", "", reader)
+	hReq, err := c.createPostRequest(context.Background(), "/api/v1/save-attachment", nil, reader)
 	if err != nil {
 		return nilAttachment, fmt.Errorf("failed to create request: %w", err)
 	}
-
-	hReq.Header.Set("Content-Type", "application/octet-stream")
 
 	hRes, err := c.httpClient.Do(hReq)
 	if err != nil {

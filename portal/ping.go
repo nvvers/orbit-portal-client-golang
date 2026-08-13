@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Client) Ping() error {
-	hReq, err := c.createGetRequest(context.Background(), "/api/v1/ping", "")
+	hReq, err := c.createGetRequest(context.Background(), "/api/v1/ping", nil)
 	if err != nil {
 		return fmt.Errorf("failed to create ping request: %w", err)
 	}

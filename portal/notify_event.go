@@ -19,7 +19,7 @@ func (c *Client) NotifyEvent(source, subject, eventType string, data any, attach
 		Attachments: attachments,
 	}
 
-	hReq, err := c.createPostRequest(context.Background(), "/api/v1/notify-event", "", req)
+	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/notify-event", nil, req)
 	if err != nil {
 		return fmt.Errorf("failed to notify event: %w", err)
 	}
