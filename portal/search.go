@@ -13,10 +13,12 @@ import (
 	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
 )
 
-func (c *Client) Search(folder string, pattern string) error {
+func (c *Client) Search(folder string, pattern string) ([]orbit.EventRecord, error) {
+	var results []orbit.EventRecord
+
 	entries, err := os.ReadDir(folder)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, entry := range entries {
@@ -56,19 +58,7 @@ func (c *Client) Search(folder string, pattern string) error {
 						return fmt.Errorf("failed to decode event from dump: %w", err)
 					}
 
-					fmt.Printf(
-						"File:      %s\n"+
-							"EventID:   %s\n"+
-							"Time:      %s\n"+
-							"Event-Data:\n"+
-							"  Source:  %s\n"+
-							"  Subject: %s\n"+
-							"  Type:    %s\n"+
-							"  Data:    %s\n"+
-							"  Attachments: %+v\n\n",
-						entry.Name(), event.ID, event.Time,
-						event.Source, event.Subject, event.Type, event.Data, event.Attachments,
-					)
+					results = append(results, event)
 				}
 
 				_ = f.Close()
@@ -79,9 +69,9 @@ func (c *Client) Search(folder string, pattern string) error {
 		}()
 
 		if err != nil {
-			fmt.Printf("Error processing file %s: %v\n", entry.Name(), err)
+			return nil, err
 		}
 	}
 
-	return nil
+	return results, nil
 }
