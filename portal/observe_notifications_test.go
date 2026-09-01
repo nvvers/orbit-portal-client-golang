@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	"github.com/nvvers/orbit-portal-client-golang/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/portaltestcontainer"
 )
 

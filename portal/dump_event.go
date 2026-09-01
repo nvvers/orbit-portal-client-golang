@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	"github.com/nvvers/orbit-portal-client-golang/orbit"
 )
 
 func (c *Client) DumpEvent(dstFile string, er orbit.EventRecord) error {

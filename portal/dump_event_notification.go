@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	orbit "github.com/nvvers/orbit-portal-client-golang/orbit"
 )
 
 type AttachmentProvider func() (orbit.Attachment, io.ReadCloser)
@@ -24,6 +24,10 @@ func (c *Client) DumpEventNotification(dstFile string, source, subject, eventTyp
 		Subject: subject,
 		Type:    eventType,
 		Data:    data,
+	}
+
+	if e.Source == "" {
+		e.Source = c.defaultSource
 	}
 
 	// --- Attachments ---

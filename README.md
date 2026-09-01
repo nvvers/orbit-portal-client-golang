@@ -340,17 +340,10 @@ internal/portalapi/   request/response DTOs for the HTTP API
 
 ## Known limitations
 
-- **The domain types live under `internal/`.** `orbit.Event`, `orbit.Notification`,
-  `orbit.EventRecord` and `orbit.Attachment` appear in the public signatures of `portal`, but Go's
-  internal-package rule prevents other modules from importing them. Until these types move to a
-  public package, external consumers cannot call `ObserveNotifications`, attach files to events, or
-  pass subsequent events to acknowledge/discard. This must be resolved before the first tagged
-  release.
 - **Most methods do not take a `context.Context`.** Only `ObserveNotifications` is context-aware;
   the remaining operations use `context.Background()` internally, so they cannot be cancelled or
   deadline-bound by the caller. Pass a `*http.Client` with a `Timeout` via `WithHttpClient` as a
   stopgap.
-- **`Search` prints to stdout** instead of returning results, which limits it to CLI-style use.
 
 ## Contributing
 

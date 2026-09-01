@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	"github.com/nvvers/orbit-portal-client-golang/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/portal"
 )
 

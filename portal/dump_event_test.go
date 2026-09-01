@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	orbit2 "github.com/nvvers/orbit-portal-client-golang/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/portaltestcontainer"
 )
 
@@ -54,7 +54,7 @@ func TestClient_DumpEvent(t *testing.T) {
 		t.Fatalf("Failed to save attachment: %v", err)
 	}
 
-	err = client.NotifyEvent("test-source", "test-subject", "test-type", map[string]string{"key": "value123456789"}, []orbit.Attachment{att})
+	err = client.NotifyEvent("test-source", "test-subject", "test-type", map[string]string{"key": "value123456789"}, []orbit2.Attachment{att})
 	if err != nil {
 		t.Fatalf("Failed to notify event: %v", err)
 	}
@@ -79,7 +79,7 @@ func TestClient_DumpEvent(t *testing.T) {
 	}
 	defer zipReader.Close()
 
-	var results []orbit.EventRecord
+	var results []orbit2.EventRecord
 	for _, file := range zipReader.File {
 		if file.Name != "event.json" {
 			continue
@@ -99,7 +99,7 @@ func TestClient_DumpEvent(t *testing.T) {
 			}
 
 			if strings.Contains(string(data), "value123456789") {
-				var event orbit.EventRecord
+				var event orbit2.EventRecord
 				if err := json.NewDecoder(bytes.NewReader(data)).Decode(&event); err != nil {
 					_ = f.Close()
 					t.Fatal("failed to decode event from dump", err)

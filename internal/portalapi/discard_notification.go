@@ -1,7 +1,7 @@
 package portalapi
 
 import (
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	"github.com/nvvers/orbit-portal-client-golang/orbit"
 
 	"github.com/google/uuid"
 )

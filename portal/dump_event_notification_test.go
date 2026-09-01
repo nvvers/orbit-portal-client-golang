@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	orbit2 "github.com/nvvers/orbit-portal-client-golang/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/portal"
 )
 
@@ -37,8 +37,8 @@ func TestClient_DumpEventNotification(t *testing.T) {
 	dumpFile := filepath.Join(tempDir, "test.oed")
 	err = client.DumpEventNotification(dumpFile, "test-source", "test-subject", "test-type", map[string]string{"key": "value123456789"},
 		[]portal.AttachmentProvider{
-			func() (orbit.Attachment, io.ReadCloser) {
-				return orbit.Attachment{
+			func() (orbit2.Attachment, io.ReadCloser) {
+				return orbit2.Attachment{
 						ID:          uuid.UUID{},
 						Name:        "test-att.txt",
 						Size:        11,
@@ -55,7 +55,7 @@ func TestClient_DumpEventNotification(t *testing.T) {
 	}
 	defer zipReader.Close()
 
-	var results []orbit.EventRecord
+	var results []orbit2.EventRecord
 	for _, file := range zipReader.File {
 		if file.Name != "event.json" {
 			continue
@@ -75,7 +75,7 @@ func TestClient_DumpEventNotification(t *testing.T) {
 			}
 
 			if strings.Contains(string(data), "value123456789") {
-				var event orbit.EventRecord
+				var event orbit2.EventRecord
 				if err := json.NewDecoder(bytes.NewReader(data)).Decode(&event); err != nil {
 					_ = f.Close()
 					t.Fatal("failed to decode event from dump", err)

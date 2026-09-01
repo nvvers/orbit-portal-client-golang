@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
+	"github.com/nvvers/orbit-portal-client-golang/orbit"
 )
 
 func (c *Client) NotifyEvent(source, subject, eventType string, data any, attachments []orbit.Attachment) error {
@@ -17,6 +17,10 @@ func (c *Client) NotifyEvent(source, subject, eventType string, data any, attach
 		Type:        eventType,
 		Data:        data,
 		Attachments: attachments,
+	}
+
+	if req.Source==""{
+		req.Source = c.defaultSource
 	}
 
 	hReq, err := c.createPostRequestWithJsonBody(context.Background(), "/api/v1/notify-event", nil, req)

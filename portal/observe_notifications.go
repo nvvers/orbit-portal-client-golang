@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/internal/portalapi"
+	orbit2 "github.com/nvvers/orbit-portal-client-golang/orbit"
 )
 
-func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yield func(orbit.Notification)) error {
+func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yield func(orbit2.Notification)) error {
 	req := portalapi.ObserveNotificationsRequest{PoolName: poolName}
 
 	hReq, err := c.createPostRequestWithJsonBody(ctx, "/api/v1/observe-notifications", nil, req)
@@ -43,7 +43,7 @@ func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yiel
 		case <-ctx.Done():
 			return nil
 		default:
-			var msg orbit.Message
+			var msg orbit2.Message
 			if err := decoder.Decode(&msg); errors.Is(err, io.EOF) {
 				return nil
 			} else if errors.Is(err, context.DeadlineExceeded) {
@@ -53,11 +53,11 @@ func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yiel
 			}
 
 			switch msg.Type {
-			case orbit.MessageTypeHeartbeat:
+			case orbit2.MessageTypeHeartbeat:
 				continue
 
-			case orbit.MessageTypeNotification:
-				var notification orbit.Notification
+			case orbit2.MessageTypeNotification:
+				var notification orbit2.Notification
 				if err := json.Unmarshal(msg.Payload, &notification); err != nil {
 					return fmt.Errorf("failed to unmarshal notification payload: %w", err)
 				}
@@ -84,7 +84,7 @@ func (c *Client) ObserveNotifications(ctx context.Context, poolName string, yiel
 
 				hRes.Body.Close()
 
-			case orbit.MessageTypeClose:
+			case orbit2.MessageTypeClose:
 				return nil
 			}
 		}

@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/nvvers/orbit-portal-client-golang/internal/orbit"
 	"github.com/nvvers/orbit-portal-client-golang/internal/portalapi"
+	"github.com/nvvers/orbit-portal-client-golang/orbit"
 )
 
 func (c *Client) PullNotification(poolName string) (*orbit.Notification, error) {

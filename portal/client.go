@@ -16,6 +16,7 @@ type Client struct {
 	httpClient    *http.Client
 	portalBaseUrl *url.URL
 	portalToken   string
+	defaultSource string
 }
 
 // Option is a function that configures the Client. It can be used to set optional parameters such as authentication tokens.
@@ -61,6 +62,13 @@ func WithHttpClient(hClient *http.Client) Option {
 		}
 
 		c.httpClient = hClient
+		return nil
+	}
+}
+
+func WithDefaultSource(source string) Option {
+	return func(c *Client) error {
+		c.defaultSource = source
 		return nil
 	}
 }
